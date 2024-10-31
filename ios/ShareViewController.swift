@@ -14,7 +14,8 @@ import UIKit
 import Social
 import RNShareMenu
 
-class ShareViewController: SLComposeServiceViewController {
+@available(iOSApplicationExtension, unavailable)
+class ShareViewController: UIViewController {
   var hostAppId: String?
   var hostAppUrlScheme: String?
   var sharedItems: [Any] = []
@@ -222,22 +223,20 @@ class ShareViewController: SLComposeServiceViewController {
       return
     }
     
-    let url = URL(string: urlScheme)
-    let selectorOpenURL = sel_registerName("openURL:")
-    var responder: UIResponder? = self
-    
-    while responder != nil {
-      if responder?.responds(to: selectorOpenURL) == true {
-        responder?.perform(selectorOpenURL, with: url)
-      }
-      responder = responder!.next
+    guard let url = URL(string: urlScheme) else {
+      exit(withError: NO_INFO_PLIST_URL_SCHEME_ERROR)
+      return
     }
     
-    completeRequest()
+    UIApplication.shared.open(url, options: [:], completionHandler: completeRequest)
   }
   
-  func completeRequest() {
-    // Inform the host that we're done, so it un-blocks its UI. Note: Alternatively you could call super's -didSelectPost, which will similarly complete the extension context.
+  func completeRequest(success: Bool) {
+    if !success {
+      cancelRequest()
+      return
+    }
+    // Inform the host that we're done, so it un-blocks its UI
     extensionContext!.completeRequest(returningItems: [], completionHandler: nil)
   }
   
