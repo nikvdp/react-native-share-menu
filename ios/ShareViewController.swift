@@ -15,6 +15,7 @@ import Social
 import RNShareMenu
 
 @available(iOSApplicationExtension, unavailable)
+
 class ShareViewController: SLComposeServiceViewController {
   var hostAppId: String?
   var hostAppUrlScheme: String?
